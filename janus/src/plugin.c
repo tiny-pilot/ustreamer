@@ -435,7 +435,9 @@ static struct janus_plugin_result *_plugin_handle_message(
 				"s=PiKVM uStreamer" RN
 				"t=0 0" RN
 				"%s%s",
-				us_get_now_id() >> 1, audio_sdp, video_sdp
+				us_get_now_id() >> 1, video_sdp, audio_sdp
+				// video SDP is placed first so that it is always at index zero regardless
+				// of if we have audio or not.
 			);
 			free(audio_sdp);
 			free(video_sdp);
