@@ -4,7 +4,7 @@ DESTDIR ?=
 PREFIX ?= /usr/local
 MANPREFIX ?= $(PREFIX)/share/man
 
-CC ?= gcc
+CC ?= zig cc -fsanitize=undefined -fsanitize-trap=undefined
 PY ?= python3
 CFLAGS ?= -O3
 LDFLAGS ?=
