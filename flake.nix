@@ -38,6 +38,22 @@
 
       };
 
+      devShells.default = nixpkgs.mkShell {
+        packages = with nixpkgs; [
+          alsaLib
+          libbsd
+          libevent
+          libjpeg
+          libopus
+          glib
+          jansson
+          janus-gateway
+          pkg-config
+          python39
+          speex
+        ];
+      };
+
       packages = forAllSystems (system:
         {
           inherit (nixpkgsFor.${system}) ustreamer;
