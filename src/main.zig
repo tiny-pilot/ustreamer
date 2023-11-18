@@ -5,25 +5,24 @@ const base64 = @cImport({
 });
 
 fn base64_encode(data: []const u8) ![]const u8 {
-    const dataSize = data.len;
-
-    // Allocate memory for the encoded data and size
+    var input: [*c]const u8 = &data[0];
 
     var encoded: [*c]u8 = null;
-    var encodedPtr: [*c][*c]u8 = &encoded;
     var allocatedSize: usize = 0;
-    var allocatedPtr: [*c]usize = &allocatedSize;
 
-    base64.us_base64_encode("yhi", dataSize, encodedPtr, allocatedPtr);
+    base64.us_base64_encode(input, data.len, &encoded, &allocatedSize);
 
+    defer _  = &std.c.free(encoded);
+
+    //var result: []const u8 = encoded;
+    //return result;
     const ex = "hello";
     return ex;
 }
 
 
 pub fn main() !void {
-    const ex = "hello";
-    const result = try base64_encode(ex);
+    const result = try base64_encode("hello, world!");
 
     const stdout_file = std.io.getStdOut().writer();
     var bw = std.io.bufferedWriter(stdout_file);
