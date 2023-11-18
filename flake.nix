@@ -1,5 +1,5 @@
 {
-  description = "Dev environment for ScreenJournal";
+  description = "Dev environment for uStreamer";
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
