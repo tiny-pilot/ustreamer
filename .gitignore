@@ -16,3 +16,5 @@ vgcore.*
 *.pkg.tar.xz
 *.pkg.tar.zst
 *.tar.gz
+zig-cache/
+zig-out/
