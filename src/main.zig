@@ -13,11 +13,8 @@ fn base64_encode(data: []const u8) ![]const u8 {
     base64.us_base64_encode(input, data.len, &encoded, &allocatedSize);
 
     defer _  = &std.c.free(encoded);
-
-    //var result: []const u8 = encoded;
-    //return result;
-    const ex = "hello";
-    return ex;
+    const z_str: []const u8 = std.mem.sliceTo(encoded, 0);
+    return z_str;
 }
 
 
@@ -27,8 +24,10 @@ pub fn main() !void {
     const stdout_file = std.io.getStdOut().writer();
     var bw = std.io.bufferedWriter(stdout_file);
     const stdout = bw.writer();
-    // Print value of result to stdout
-    try stdout.print("result: {any}\n", .{result});
+    const expected = [_]u8{ 'a', 'G', 'V', 's', 'b', 'G', '8', 's', 'I', 'H', 'd', 'v', 'c', 'm', 'x', 'k', 'I', 'Q', '=', '=' };
+    try stdout.print("expected: {any} (len={d})\n", .{ expected, expected.len });
+    try stdout.print("result  : {any} (len={d})\n", .{result, result.len});
+    try stdout.print("result  : {s}\n", .{result});
     try bw.flush();
 }
 

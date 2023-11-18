@@ -39,7 +39,7 @@ static const unsigned _MOD_TABLE[] = {0, 2, 1};
 
 void us_base64_encode(const uint8_t *data, size_t size, char **encoded, size_t *allocated) {
   printf("us_base64_encode\n"); // DEBUG
-  printf("size: %d\n", size); // DEBUG
+  printf("input: [%s], len=%d\n", data, size); // DEBUG
 
 	const size_t encoded_size = 4 * ((size + 2) / 3) + 1; // +1 for '\0'
 
@@ -47,11 +47,12 @@ void us_base64_encode(const uint8_t *data, size_t size, char **encoded, size_t *
     printf("allocating: %d\n", encoded_size); // DEBUG
 		US_REALLOC(*encoded, encoded_size);
 		if (allocated) {
+      printf("allocation succeeded\n"); // DEBUG
 			*allocated = encoded_size;
 		}
 	}
 
-	for (unsigned data_index = 0, encoded_index = 0; data_index < size;) {
+	for (size_t data_index = 0, encoded_index = 0; data_index < size;) {
 #		define OCTET(_name) unsigned _name = (data_index < size ? (uint8_t)data[data_index++] : 0)
 		OCTET(octet_a);
 		OCTET(octet_b);
@@ -68,7 +69,7 @@ void us_base64_encode(const uint8_t *data, size_t size, char **encoded, size_t *
 #		undef ENCODE
 	}
 
-	for (unsigned index = 0; index < _MOD_TABLE[size % 3]; index++) {
+	for (size_t index = 0; index < _MOD_TABLE[size % 3]; index++) {
 		(*encoded)[encoded_size - 2 - index] = '=';
 	}
 
