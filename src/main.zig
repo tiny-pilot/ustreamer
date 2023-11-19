@@ -5,7 +5,7 @@ const base64 = @cImport({
 });
 
 fn base64_encode(allocator: std.mem.Allocator, data: []const u8) ![]const u8 {
-    var input: [*c]const u8 = &data[0];
+    var input: [*c]const u8 = data.ptr;
 
     var cEncoded: [*c]u8 = null;
     var allocatedSize: usize = 0;
@@ -51,10 +51,18 @@ pub fn main() !void {
     try bw.flush();
 }
 
-test "test base64 encode" {
+test "encode simple string" {
     const allocator = std.testing.allocator;
     const actual = try base64_encode(allocator, "hello, world!");
     defer allocator.free(actual);
     const expected = "aGVsbG8sIHdvcmxkIQ==";
+    try std.testing.expectEqualStrings(@as([]const u8, expected), actual);
+}
+
+test "encode empty string" {
+    const allocator = std.testing.allocator;
+    const actual = try base64_encode(allocator, "");
+    defer allocator.free(actual);
+    const expected = "";
     try std.testing.expectEqualStrings(@as([]const u8, expected), actual);
 }
