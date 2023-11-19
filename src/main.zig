@@ -31,13 +31,8 @@ pub fn main() !void {
     try bw.flush();
 }
 
-
-
 test "test base64 encode" {
-    const ex = "hello";
-    const result = try base64_encode(ex);
-    try std.testing.expectEqual(@as([]const u8, ex), result);
-
-    //var expected = "aGVsbG8=";
-    //try std.testing.expectEqual(@as([]u8, ex), base64_encode([_]u8{ 'h', 'e', 'l', 'l', 'o' }));
+    const actual = try base64_encode("hello, world!");
+    const expected = "aGVsbG8gd29ybGQ=";
+    try std.testing.expectEqualStrings(@as([]const u8, expected), actual);
 }
