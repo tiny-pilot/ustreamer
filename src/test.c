@@ -4,7 +4,7 @@
 
 int main(void)
 {
-  char *raw_token = "hello world";
+  char *raw_token = "hello, world!";
   char *encoded_token = NULL;
   us_base64_encode((uint8_t *)raw_token, strlen(raw_token), &encoded_token, NULL);
   printf("encoded=%s\n", encoded_token);
