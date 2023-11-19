@@ -39,8 +39,6 @@ pub fn main() !void {
     const input =  try std.io.getStdIn().readToEndAlloc(allocator, maxBytesToRead);
     defer allocator.free(input);
 
-    std.debug.print("input: {s}\n", .{input});
-
     const result = try base64_encode(allocator, input);
     defer allocator.free(result);
 
