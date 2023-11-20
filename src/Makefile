@@ -1,7 +1,7 @@
 DESTDIR ?=
 PREFIX ?= /usr/local
 
-CC ?= gcc
+CC ?= zig cc -fsanitize=undefined -fsanitize-trap=undefined
 CFLAGS ?= -O3
 LDFLAGS ?=
 

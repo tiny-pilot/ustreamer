@@ -15,31 +15,13 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
-    const base64 = b.addStaticLibrary(.{
-        .name = "base64",
-        .target = target,
-        .optimize = optimize,
-    });
-    base64.linkLibC();
-    base64.addCSourceFiles(&.{
-        "src/libs/base64.c",
-    }, &.{
-        "-Wall",
-        "-W",
-        "-Wstrict-prototypes",
-        "-Wwrite-strings",
-        "-Wno-missing-field-initializers",
-        "-Wno-unused-parameter",
-    });
-
-
     const exe = b.addExecutable(.{
         .name = "base64-encoder",
         .root_source_file = .{ .path = "src/main.zig" },
         .target = target,
         .optimize = optimize,
     });
-    exe.linkLibrary(base64);
+    exe.linkLibC();
     exe.addIncludePath(.{ .path = "src" });
 
     // This declares intent for the executable to be installed into the
@@ -77,7 +59,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    unit_tests.linkLibrary(base64);
+    unit_tests.linkLibC();
     unit_tests.addIncludePath(.{ .path = "src" });
 
     const run_unit_tests = b.addRunArtifact(unit_tests);

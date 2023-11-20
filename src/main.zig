@@ -1,7 +1,7 @@
 const std = @import("std");
 
 const base64 = @cImport({
-    @cInclude("libs/base64.h");
+    @cInclude("libs/base64.c");
 });
 
 fn base64_encode(allocator: std.mem.Allocator, data: []const u8) ![]const u8 {
