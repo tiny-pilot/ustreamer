@@ -5,12 +5,10 @@ const base64 = @cImport({
 });
 
 fn base64_encode(allocator: std.mem.Allocator, data: []const u8) ![]const u8 {
-    var input: [*c]const u8 = data.ptr;
-
     var cEncoded: [*c]u8 = null;
     var allocatedSize: usize = 0;
 
-    base64.us_base64_encode(input, data.len, &cEncoded, &allocatedSize);
+    base64.us_base64_encode(data.ptr, data.len, &cEncoded, &allocatedSize);
     defer std.c.free(cEncoded);
 
     return c_string_to_zig_string(allocator, cEncoded, allocatedSize);
