@@ -24,9 +24,7 @@ fn c_string_to_zig_string(allocator: std.mem.Allocator, cString: [*c]const u8, c
     const zigString = try allocator.alloc(u8, zigStringLength);
     errdefer allocator.free(zigString);
 
-    // TODO: Avoid iterating the whole string.
-    const cStringSlice: []const u8 = std.mem.span(cString);
-    @memcpy(zigString.ptr, cStringSlice);
+    @memcpy(zigString.ptr, cString[0..zigStringLength]);
 
     return zigString;
 }
