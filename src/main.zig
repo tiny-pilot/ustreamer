@@ -24,6 +24,7 @@ fn c_string_to_zig_string(allocator: std.mem.Allocator, cString: [*c]const u8, c
     const zigString = try allocator.alloc(u8, zigStringLength);
     errdefer allocator.free(zigString);
 
+    // TODO: Avoid iterating the whole string.
     const cStringSlice: []const u8 = std.mem.span(cString);
     @memcpy(zigString.ptr, cStringSlice);
 
@@ -49,6 +50,7 @@ pub fn main() !void {
     try bw.flush();
 }
 
+// based on Zig's test helpers in std/base64.zig
 fn testBase64Encode(input: []const u8, expected: []const u8, ) !void {
     const allocator = std.testing.allocator;
     const actual = try base64_encode(allocator, input);
