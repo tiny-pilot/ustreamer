@@ -20,6 +20,7 @@ pub fn main() !void {
     defer std.c.free(cEncoded);
 
     // Print the input and output of the base64 encode operation.
-    std.debug.print("input:  {s}\n", .{input});
-    std.debug.print("output: {s}\n", .{cEncoded});
+    std.debug.print("input:       {s}\n", .{input});
+    std.debug.print("output:      {s}\n", .{cEncoded});
+    std.debug.print("output size: {d}\n", .{allocatedSize});
 }
