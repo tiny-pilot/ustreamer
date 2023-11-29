@@ -15,6 +15,8 @@ pub fn main() !void {
 
     // Call the uStreamer C function from Zig.
     ustreamer.us_base64_encode(input.ptr, input.len, &cEncoded, &allocatedSize);
+
+    // Free the memory that the C function allocated when this function exits.
     defer std.c.free(cEncoded);
 
     // Print the input and output of the base64 encode operation.
