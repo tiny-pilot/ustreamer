@@ -1,30 +1,27 @@
 const std = @import("std");
 
-const base64 = @cImport({
+const ustreamer = @cImport({
     @cInclude("libs/base64.c");
 });
 
-fn base64Encode(allocator: std.mem.Allocator, data: []const u8) ![]const u8 {
+fn base64Encode(allocator: std.mem.Allocator, data: []const u8) ![*:0]const u8 {
     var cEncoded: [*c]u8 = null;
     var allocatedSize: usize = 0;
 
-    base64.us_base64_encode(data.ptr, data.len, &cEncoded, &allocatedSize);
+    ustreamer.us_base64_encode(data.ptr, data.len, &cEncoded, &allocatedSize);
     defer std.c.free(cEncoded);
 
-    return cStringToZigString(allocator, cEncoded, allocatedSize);
+    return cStringToZigString(allocator, cEncoded, allocatedSize - 1);
 }
 
-fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStringLength: usize) ![]const u8 {
-    // The C-function returns a null-terminated string. Strings in Zig are not
-    // null-terminated, so we need to allocate one fewer byte.
-    const zigStringLength = cStringLength - 1;
-
-    const zigString = try allocator.alloc(u8, zigStringLength);
+fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStringLength: usize) ![*:0]const u8 {
+    const zigString = try allocator.alloc(u8, cStringLength + 1);
     errdefer allocator.free(zigString);
 
-    @memcpy(zigString.ptr, cString[0..zigStringLength]);
+    @memcpy(zigString, cString[0..cStringLength]);
+    const zigStringSlice = zigString[0..cStringLength :0];
 
-    return zigString;
+    return zigStringSlice;
 }
 
 pub fn main() !void {
@@ -33,7 +30,7 @@ pub fn main() !void {
     defer _ = gpa.deinit();
 
     const maxBytesToRead = 100000;
-    const input =  try std.io.getStdIn().readToEndAlloc(allocator, maxBytesToRead);
+    const input = try std.io.getStdIn().readToEndAlloc(allocator, maxBytesToRead);
     defer allocator.free(input);
 
     const result = try base64Encode(allocator, input);
@@ -47,7 +44,10 @@ pub fn main() !void {
 }
 
 // based on Zig's test helpers in std/base64.zig
-fn testBase64Encode(input: []const u8, expected: []const u8, ) !void {
+fn testBase64Encode(
+    input: []const u8,
+    expected: [*:0]const u8,
+) !void {
     const allocator = std.testing.allocator;
     const actual = try base64Encode(allocator, input);
     defer allocator.free(actual);
