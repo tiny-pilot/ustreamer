@@ -4,24 +4,23 @@ const ustreamer = @cImport({
     @cInclude("libs/base64.c");
 });
 
-fn base64Encode(allocator: std.mem.Allocator, data: []const u8) ![*:0]const u8 {
+fn base64Encode(allocator: std.mem.Allocator, data: []const u8) ![:0]const u8 {
     var cEncoded: [*c]u8 = null;
     var allocatedSize: usize = 0;
 
     ustreamer.us_base64_encode(data.ptr, data.len, &cEncoded, &allocatedSize);
     defer std.c.free(cEncoded);
 
-    return cStringToZigString(allocator, cEncoded, allocatedSize - 1);
+    // String length is the size of the buffer excluding the null terminator.
+    const cEncodedLength = allocatedSize - 1;
+
+    return cStringToZigString(allocator, cEncoded, cEncodedLength);
 }
 
-fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStringLength: usize) ![*:0]const u8 {
+fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStringLength: usize) ![:0]const u8 {
     const zigString = try allocator.alloc(u8, cStringLength + 1);
-    errdefer allocator.free(zigString);
-
-    @memcpy(zigString, cString[0..cStringLength]);
-    const zigStringSlice = zigString[0..cStringLength :0];
-
-    return zigStringSlice;
+    @memcpy(zigString, cString[0 .. cStringLength + 1]);
+    return zigString[0..cStringLength :0];
 }
 
 pub fn main() !void {
@@ -44,10 +43,7 @@ pub fn main() !void {
 }
 
 // based on Zig's test helpers in std/base64.zig
-fn testBase64Encode(
-    input: []const u8,
-    expected: [*:0]const u8,
-) !void {
+fn testBase64Encode(input: []const u8, expected: [:0]const u8) !void {
     const allocator = std.testing.allocator;
     const actual = try base64Encode(allocator, input);
     defer allocator.free(actual);
