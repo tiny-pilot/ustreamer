@@ -189,6 +189,8 @@ INLINE char *us_errno_to_string(int error) {
 	return buf;
 }
 
+/*
+DEBUG: Temporarily delete this function to get the build working again.
 INLINE char *us_signum_to_string(int signum) {
 #	ifdef HAS_SIGABBREV_NP
 	const char *const name = sigabbrev_np(signum);
@@ -208,3 +210,4 @@ INLINE char *us_signum_to_string(int signum) {
 	}
 	return buf;
 }
+*/
