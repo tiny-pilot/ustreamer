@@ -9,15 +9,23 @@ const StrdupError = error{
 };
 
 fn strdup(allocator: std.mem.Allocator, str: [:0]const u8) ![:0]u8 {
-    const cCopy: [*c]u8 = cString.strdup(str);
+    const cCopy = cString.strdup(str);
     if (cCopy == null) {
         // Maybe we can return a better error by calling std.os.errno(), but for
         // now, return a generic error.
         return error.StrdupFailure;
     }
     defer std.c.free(cCopy);
-    const zCopy: [:0]u8 = std.mem.span(cCopy);
-    const copy: [:0]u8 = try allocator.allocSentinel(u8, zCopy.len, 0);
+    const zCopy = std.mem.span(cCopy);
+    std.debug.print("type(zCopy)={}\n", .{@TypeOf(zCopy)});
+    std.debug.print("size(zCopy)={d}\n", .{@sizeOf(@TypeOf(zCopy))});
+    std.debug.print("zCopy.len={d}\n", .{zCopy.len});
+    //const length = std.mem.len(cCopy);
+    //const copy = try allocator.alloc(u8, @sizeOf(@TypeOf(zCopy)));
+    const copy = try allocator.allocSentinel(u8, zCopy.len, 0);
+    std.debug.print("type(copy)={}\n", .{@TypeOf(copy)});
+    std.debug.print("size(copy)={d}\n", .{@sizeOf(@TypeOf(copy))});
+    std.debug.print("copy.len={d}\n", .{copy.len});
     @memcpy(copy, zCopy);
 
     return copy;
