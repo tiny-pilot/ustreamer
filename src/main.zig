@@ -5,7 +5,20 @@ const ustreamer = @cImport({
     @cInclude("libs/base64.c");
 });
 
+const c = @cImport({
+    @cInclude("string.h");
+});
+fn strlen(str: [*:0]const u8) usize {
+    return c.strlen(str);
+}
+
 pub fn main() !void {
+    const properString = "hello";
+    std.debug.print("len={d}\n", .{strlen(properString)});
+    const notNullTerminated = [_:0]u8{ 'h', 'e', 'l', 'l', 'o' };
+    std.debug.print("len={d}\n", .{strlen(&notNullTerminated)});
+    std.debug.print("len={d}\n", .{notNullTerminated.len});
+    std.debug.print("val={d}\n", .{notNullTerminated[5]});
     // Create a standard Zig string.
     const input = "hello, world!";
 

@@ -1,14 +1,23 @@
 #include <stdio.h>
+#include <string.h>
 
-#include "libs/base64.h"
+// INSECURE: Don't do any of this in production code.
+void print_rules(char* name) {
+  // Create a buffer for our full string that can hold 14 characters plus a null
+  // terminator.
+  char str[15] = {'\0'};
+
+  // Copy the name into the buffer.
+  strcpy(str, name);
+
+  // Copy the end of the string into the buffer.
+  strcat(str, " rules!");
+
+  // Print the contents of the full string.
+  printf("%s\n", str);
+}
 
 void main(void) {
-  char *input = "hello, world!";
-  char *encoded = NULL;
-  size_t encoded_bytes = 0;
-  us_base64_encode((uint8_t *)input, strlen(input), &encoded, &encoded_bytes);
-  printf("input:        %s\n", input);
-  printf("output:       %s\n", encoded);
-  printf("output bytes: %lu\n", encoded_bytes);
-  free(encoded);
+  print_rules("michael");
+  print_rules("rumplestiltskin");
 }
