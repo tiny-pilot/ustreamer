@@ -29,8 +29,8 @@ pub fn main() !void {
     defer _ = gpa.deinit();
 
     const s = "hi";
-    std.debug.print("s={s}\n", .{s});
+    std.debug.print("s    = [{s}] (type={}, size={d}, len={d})\n", .{ s, @TypeOf(s), @sizeOf(@TypeOf(s.*)), s.len });
     const sCopy = try strdup(allocator, s);
     defer allocator.free(sCopy);
-    std.debug.print("sCopy={s}\n", .{sCopy});
+    std.debug.print("sCopy= [{s}] (type={}, size={d}, len={d})\n", .{ sCopy, @TypeOf(sCopy), @sizeOf(@TypeOf(sCopy)), sCopy.len });
 }
