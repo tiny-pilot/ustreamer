@@ -49,9 +49,27 @@ pub fn main() !void {
     std.debug.print("output size: {d}\n", .{output.len});
 }
 
-test "encode simple string as base64" {
+fn testBase64Encode(
+    input: []const u8,
+    expected: [:0]const u8,
+) !void {
     const allocator = std.testing.allocator;
-    const actual = try base64Encode(allocator, "hello, world!");
+    const actual = try base64Encode(allocator, input);
     defer allocator.free(actual);
-    try std.testing.expectEqualStrings("aGVsbG8sIHdvcmxkIQ==", actual);
+    try std.testing.expectEqualStrings(expected, actual);
+}
+
+test "encode simple data as base64" {
+    try testBase64Encode("", "");
+    try testBase64Encode("h", "aA==");
+    try testBase64Encode("he", "aGU=");
+    try testBase64Encode("hel", "aGVs");
+    try testBase64Encode("hell", "aGVsbA==");
+    try testBase64Encode("hello, world!", "aGVsbG8sIHdvcmxkIQ==");
+    try testBase64Encode(&[_]u8{0}, "AA==");
+    try testBase64Encode(&[_]u8{ 0, 0 }, "AAA=");
+    try testBase64Encode(&[_]u8{ 0, 0, 0 }, "AAAA");
+    try testBase64Encode(&[_]u8{255}, "/w==");
+    try testBase64Encode(&[_]u8{ 255, 255 }, "//8=");
+    try testBase64Encode(&[_]u8{ 255, 255, 255 }, "////");
 }
