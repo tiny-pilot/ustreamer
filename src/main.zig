@@ -19,6 +19,9 @@ fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStri
     // element count excluding the null terminator.
     const zigStringLength = cStringSize - 1;
     const zigString = try allocator.allocSentinel(u8, zigStringLength, 0);
+
+    // If we can't return the result, we should handle freeing the memory we
+    // allocated.
     errdefer allocator.free(zigString);
 
     @memcpy(zigString.ptr, cString[0..cStringSize :0]);
