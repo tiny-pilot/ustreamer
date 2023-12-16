@@ -20,10 +20,11 @@ fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStri
     const zigStringLength = cStringSize - 1;
     const zigString = try allocator.allocSentinel(u8, zigStringLength, 0);
 
-    // If we can't return the result, we should handle freeing the memory we
-    // allocated.
+    // If we can't return the result, free the memory we allocated.
     errdefer allocator.free(zigString);
 
+    // Create a Zig slice of cString, and declare to Zig that the slice ends
+    // with a null terminator.
     @memcpy(zigString.ptr, cString[0..cStringSize :0]);
 
     return zigString;
