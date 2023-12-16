@@ -66,4 +66,10 @@ test "encode simple string" {
     try testBase64Encode("hel", "aGVs");
     try testBase64Encode("hell", "aGVsbA==");
     try testBase64Encode("hello, world!", "aGVsbG8sIHdvcmxkIQ==");
+    try testBase64Encode(&[_]u8{0}, "AA==");
+    try testBase64Encode(&[_]u8{ 0, 0 }, "AAA=");
+    try testBase64Encode(&[_]u8{ 0, 0, 0 }, "AAAA");
+    try testBase64Encode(&[_]u8{255}, "/w==");
+    try testBase64Encode(&[_]u8{ 255, 255 }, "//8=");
+    try testBase64Encode(&[_]u8{ 255, 255, 255 }, "////");
 }
