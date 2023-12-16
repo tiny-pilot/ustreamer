@@ -11,21 +11,21 @@ fn base64Encode(allocator: std.mem.Allocator, data: []const u8) ![:0]u8 {
     base64.us_base64_encode(data.ptr, data.len, &cEncoded, &allocatedSize);
     defer std.c.free(cEncoded);
 
-    return cStringToZigString(allocator, cEncoded, allocatedSize);
+    const cEncodedLength = allocatedSize - 1;
+    return cStringToZigString(allocator, cEncoded, cEncodedLength);
 }
 
-fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStringSize: usize) ![:0]u8 {
-    // cStringSize includes the null terminator, but allocSentinel takes an
-    // element count excluding the null terminator.
-    const zigStringLength = cStringSize - 1;
-    const zigString = try allocator.allocSentinel(u8, zigStringLength, 0);
+fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStringLength: usize) ![:0]u8 {
+    // Allocate a Zig-managed buffer to contain the contents of cString.
+    const zigString = try allocator.allocSentinel(u8, cStringLength, 0);
 
     // If we can't return the result, free the memory we allocated.
     errdefer allocator.free(zigString);
 
     // Create a Zig slice of cString, and declare to Zig that the slice ends
     // with a null terminator.
-    @memcpy(zigString.ptr, cString[0..cStringSize :0]);
+    const cStringSlice = cString[0..cStringLength :0];
+    @memcpy(zigString.ptr, cStringSlice);
 
     return zigString;
 }
