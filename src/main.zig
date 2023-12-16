@@ -4,26 +4,13 @@ const base64 = @cImport({
     @cInclude("libs/base64.c");
 });
 
-fn base64Encode(allocator: std.mem.Allocator, data: []const u8) ![:0]const u8 {
+fn base64Encode(data: []const u8) ![:0]const u8 {
     var cEncoded: [*c]u8 = null;
     var allocatedSize: usize = 0;
 
     base64.us_base64_encode(data.ptr, data.len, &cEncoded, &allocatedSize);
-    defer std.c.free(cEncoded);
-
-    return cStringToZigString(allocator, cEncoded, allocatedSize);
-}
-
-fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStringSize: usize) ![:0]const u8 {
-    // cStringSize includes the null terminator, but allocSentinel takes an
-    // element count excluding the null terminator.
-    const zigStringLength = cStringSize - 1;
-    const zigString = try allocator.allocSentinel(u8, zigStringLength, 0);
-    errdefer allocator.free(zigString);
-
-    @memcpy(zigString.ptr, cString[0..cStringSize :0]);
-
-    return zigString;
+    const cEncodedLength = allocatedSize - 1;
+    return cEncoded[0..cEncodedLength :0];
 }
 
 pub fn main() !void {
@@ -35,8 +22,8 @@ pub fn main() !void {
     const input = try std.io.getStdIn().readToEndAlloc(allocator, maxBytesToRead);
     defer allocator.free(input);
 
-    const result = try base64Encode(allocator, input);
-    defer allocator.free(result);
+    const result = try base64Encode(input);
+    defer std.c.free(result);
 
     const stdout_file = std.io.getStdOut().writer();
     var bw = std.io.bufferedWriter(stdout_file);
@@ -50,9 +37,8 @@ fn testBase64Encode(
     input: []const u8,
     expected: [:0]const u8,
 ) !void {
-    const allocator = std.testing.allocator;
-    const actual = try base64Encode(allocator, input);
-    defer allocator.free(actual);
+    const actual = try base64Encode(input);
+    defer std.c.free(actual.*);
     try std.testing.expectEqualStrings(expected, actual);
 }
 
