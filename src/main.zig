@@ -11,6 +11,7 @@ fn base64Encode(allocator: std.mem.Allocator, data: []const u8) ![:0]u8 {
     base64.us_base64_encode(data.ptr, data.len, &cEncoded, &allocatedSize);
     defer std.c.free(cEncoded);
 
+    // The length of the string excludes the null-terminator, so subtract 1.
     const cEncodedLength = allocatedSize - 1;
     return cStringToZigString(allocator, cEncoded, cEncodedLength);
 }
