@@ -4,7 +4,7 @@ const base64 = @cImport({
     @cInclude("libs/base64.c");
 });
 
-fn base64Encode(allocator: std.mem.Allocator, data: []const u8) ![:0]const u8 {
+fn base64Encode(allocator: std.mem.Allocator, data: []const u8) ![:0]u8 {
     var cEncoded: [*c]u8 = null;
     var allocatedSize: usize = 0;
 
@@ -14,7 +14,7 @@ fn base64Encode(allocator: std.mem.Allocator, data: []const u8) ![:0]const u8 {
     return cStringToZigString(allocator, cEncoded, allocatedSize);
 }
 
-fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStringSize: usize) ![:0]const u8 {
+fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStringSize: usize) ![:0]u8 {
     // cStringSize includes the null terminator, but allocSentinel takes an
     // element count excluding the null terminator.
     const zigStringLength = cStringSize - 1;
