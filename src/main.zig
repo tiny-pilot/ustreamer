@@ -48,3 +48,10 @@ pub fn main() !void {
     std.debug.print("output:      {s}\n", .{output});
     std.debug.print("output size: {d}\n", .{output.len});
 }
+
+test "encode simple string as base64" {
+    const allocator = std.testing.allocator;
+    const actual = try base64Encode(allocator, "hello, world!");
+    defer allocator.free(actual);
+    try std.testing.expectEqualStrings("aGVsbG8sIHdvcmxkIQ==", actual);
+}
