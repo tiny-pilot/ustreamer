@@ -6,32 +6,17 @@ const ustreamer = @cImport({
 });
 
 fn base64Encode(allocator: std.mem.Allocator, data: []const u8) ![:0]u8 {
-    var cEncoded: [*c]u8 = null;
+    var cEncodedOptional: ?[*:0]u8 = null;
     var allocatedSize: usize = 0;
 
-    ustreamer.us_base64_encode(data.ptr, data.len, &cEncoded, &allocatedSize);
-    defer std.c.free(cEncoded);
+    ustreamer.us_base64_encode(data.ptr, data.len, &cEncodedOptional, &allocatedSize);
+    const cEncoded: [*:0]u8 = cEncodedOptional orelse return error.UnexpectedNull;
+    defer std.c.free(cEncodedOptional);
 
-    // The length of the string excludes the null-terminator, so subtract 1.
+    // The allocatedSize includes the null terminator, so subtract 1 to get the
+    // number of non-null characters in the string.
     const cEncodedLength = allocatedSize - 1;
-    return cStringToZigString(allocator, cEncoded, cEncodedLength);
-}
-
-fn cStringToZigString(allocator: std.mem.Allocator, cString: [*c]const u8, cStringLength: usize) ![:0]u8 {
-    // Allocate a Zig-managed buffer to contain the contents of cString.
-    const zigString = try allocator.allocSentinel(u8, cStringLength, 0);
-
-    // If we can't return the result, free the memory we allocated.
-    errdefer allocator.free(zigString);
-
-    // Create a Zig slice of cString, and declare to Zig that the slice ends
-    // with a null terminator.
-    const cStringSlice = cString[0..cStringLength :0];
-
-    // Copy the contents of the C string into the Zig slice.
-    @memcpy(zigString.ptr, cStringSlice);
-
-    return zigString;
+    return allocator.dupeZ(u8, cEncoded[0..cEncodedLength :0]);
 }
 
 pub fn main() !void {
