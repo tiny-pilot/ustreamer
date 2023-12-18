@@ -44,13 +44,16 @@ fn testBase64Encode(
     try std.testing.expectEqualStrings(expected, actual);
 }
 
-test "encode simple data as base64" {
+test "encode strings as base64" {
     try testBase64Encode("", "");
     try testBase64Encode("h", "aA==");
     try testBase64Encode("he", "aGU=");
     try testBase64Encode("hel", "aGVs");
     try testBase64Encode("hell", "aGVsbA==");
     try testBase64Encode("hello, world!", "aGVsbG8sIHdvcmxkIQ==");
+}
+
+test "encode raw bytes as base64" {
     try testBase64Encode(&[_]u8{0}, "AA==");
     try testBase64Encode(&[_]u8{ 0, 0 }, "AAA=");
     try testBase64Encode(&[_]u8{ 0, 0, 0 }, "AAAA");
